@@ -1,0 +1,26 @@
+venv/ 
+__pycache__/ 
+.env 
+uploads/ 
+vector_store/ 
+documents_metadata.json 
+.vscode/ 
+node_modules/ 
+
+# Environnement virtuel
+back-end/venv/
+
+# Cache Python
+back-end/__pycache__/
+
+# Fichiers de configuration
+back-end/.env
+back-end/documents_metadata.json
+
+# Données générées
+back-end/uploads/
+back-end/vector_store/
+back-end/vector_store_assurance/
+
+# Front-end
+rag-interface/node_modules/

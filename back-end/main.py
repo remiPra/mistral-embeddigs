@@ -1,4 +1,8 @@
 # main.py
+from fastapi.responses import StreamingResponse
+import edge_tts
+import asyncio
+import io
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -236,6 +240,33 @@ async def query(query: Query):
     try:
         response = rag_system.query(query.question)
         return {"response": response}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+    
+
+@app.post("/speak")
+async def text_to_speech(text: dict):
+    try:
+        communicate = edge_tts.Communicate(text["text"], "fr-FR-HenriNeural")
+        audio_stream = io.BytesIO()
+        
+        async def generate_audio():
+            async for chunk in communicate.stream():
+                if chunk["type"] == "audio":
+                    audio_stream.write(chunk["data"])
+            audio_stream.seek(0)
+            return audio_stream
+        
+        audio_data = await generate_audio()
+        
+        return StreamingResponse(
+            audio_data,
+            media_type="audio/mpeg",
+            headers={
+                "Content-Disposition": "attachment; filename=speech.mp3"
+            }
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
